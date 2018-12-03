@@ -11,6 +11,7 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 from trajectory_msgs.msg import JointTrajectory
 import math
 import sys
+from std_msgs.msg import Float64
 
 def lim(n):
 	# Finds the n value between minn og maxn
@@ -49,6 +50,7 @@ class MoveRobot:
 
 	def __init__(self,server_name, xpos_ypos_zpos_angle):
 		self.client = actionlib.SimpleActionClient(server_name, FollowJointTrajectoryAction)
+		gripper = rospy.Publisher('/gripper/command', Float64, queue_size=10)
 
 		self.joint_positions = []
 		self.names =["joint1", "joint2", "joint3", "joint4"]
@@ -92,13 +94,20 @@ def move_robotic_arm(xpos_ypos_zpos_angle):
 	node.send_command()
 
 def open_gripper():
-	print "gripper opening"
+	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
+	pub.publish(0)
 
 def close_gripper():	
-	print "gripper closing"
+	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
+	pub.publish(6)
 	
 if __name__ == "__main__":
-	xyza = [0,1,0,0]
+    	xyza = [1,1,1,0]
 	rospy.init_node("move_robot")
+	# robotic_arm_standard_position()
+	open_gripper();
 	move_robotic_arm(xyza);
+	close_gripper();
 	robotic_arm_standard_position();
+	open_gripper();
+	
