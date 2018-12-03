@@ -20,23 +20,39 @@ def lim(n):
 def invkin(xyz):
 	d1 = 16.8; # cm (height of 2nd joint)
 	a1 = 0; # (distance along "y-axis" to 2nd joint)
-	a2 = 17.2; # (distance between 2nd and 3rd joints)
+	a2 = 19.2; # (distance between 2nd and 3rd joints)
 	d4 = 23.5; # (distance from 3rd joint to gripper center - all inclusive, ie. also 4th joint)
 
 	# Insert code here!!!
 	xc = xyz[0]; yc = xyz[1]; zc = xyz[2]
 
-	# -1.919 is equals to 110 deg
+	# # -1.919 is equals to 110 deg
 	q1 = lim(math.atan2(yc, xc))
 	
-
 	r2 = (xc - a1*math.cos(q1))**2 + (yc - a1*math.sin(q1))**2
 	s = (zc - d1)
-	D = ( r2 + s**2 - a2**2 - d4**2)/(2*a2*d4)
+	D = ( r2 + math.pow(s,2) - math.pow(a2,2) - math.pow(d4,2))/(2*a2*d4)
 
-	q3 = lim(math.atan2(-math.sqrt(1-D**2), D))
+	q3 = lim(math.atan2(-math.sqrt(1-math.pow(D,2)), D))
 
-	q2 = lim(math.atan2(s, math.sqrt(r2)) - math.atan2(d4*math.sin(q3), a2 + d4*math.cos(q3)))
+	q2 = lim(math.atan2(s, math.sqrt(r2)) - math.atan2(d4*math.sin(q3), a2 + d4*math.cos(q3))-(math.pi/4))
+
+	# TEST
+
+	# x1 = xyz[0];
+	# y1 = xyz[1];
+	# z1 = xyz[2];
+
+	# q1 = math.atan2(y1, x1)	
+
+	# # Calculate q2 and q3
+	# r2 = math.pow((x1 - a1 * math.cos(q1)),2) + math.pow((y1 - a1 * math.sin(q1)),2)
+	# s = (z1 - d1)
+	# D = (r2 + math.pow(s,2) - math.pow(a2,2) - math.pow(d4,2)) / (2 * a2 * d4)
+
+	# q3 = math.atan2(-math.sqrt(1 - math.pow(D,2)), D)
+	# q2 = math.atan2(s, math.sqrt(r2)) - math.atan2(d4 * math.sin(q3), a2 + d4 * math.cos(q3))-(math.pi/2)
+
 
 	q4 = xyz[3]
 
@@ -83,7 +99,7 @@ class MoveRobot:
 		self.client.wait_for_result()
 
 def robotic_arm_standard_position():
-	node = MoveRobot("/arm_controller/follow_joint_trajectory", [5, 0 , 5, 0])
+	node = MoveRobot("/arm_controller/follow_joint_trajectory", [25, 0 , 15, 0])
 	# Here we initiate the movement of the arm
 	node.send_command()
 
@@ -100,14 +116,4 @@ def open_gripper():
 def close_gripper():	
 	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
 	pub.publish(6)
-	
-if __name__ == "__main__":
-    	xyza = [1,1,1,0]
-	rospy.init_node("move_robot")
-	# robotic_arm_standard_position()
-	open_gripper();
-	move_robotic_arm(xyza);
-	close_gripper();
-	robotic_arm_standard_position();
-	open_gripper();
 	
