@@ -37,23 +37,6 @@ def invkin(xyz):
 
 	q2 = lim(math.atan2(s, math.sqrt(r2)) - math.atan2(d4*math.sin(q3), a2 + d4*math.cos(q3))-(math.pi/4))
 
-	# TEST
-
-	# x1 = xyz[0];
-	# y1 = xyz[1];
-	# z1 = xyz[2];
-
-	# q1 = math.atan2(y1, x1)	
-
-	# # Calculate q2 and q3
-	# r2 = math.pow((x1 - a1 * math.cos(q1)),2) + math.pow((y1 - a1 * math.sin(q1)),2)
-	# s = (z1 - d1)
-	# D = (r2 + math.pow(s,2) - math.pow(a2,2) - math.pow(d4,2)) / (2 * a2 * d4)
-
-	# q3 = math.atan2(-math.sqrt(1 - math.pow(D,2)), D)
-	# q2 = math.atan2(s, math.sqrt(r2)) - math.atan2(d4 * math.sin(q3), a2 + d4 * math.cos(q3))-(math.pi/2)
-
-
 	q4 = xyz[3]
 
 	print "q1:" + str(math.degrees(q1)) + ", q2: " + str(math.degrees(q2)) + ", q3: " + str(math.degrees(q3)) + ", q4: " + str(math.degrees(q4));
@@ -98,17 +81,6 @@ class MoveRobot:
 		self.client.send_goal(self.goal)
 		self.client.wait_for_result()
 
-def robotic_arm_standard_position():
-	node = MoveRobot("/arm_controller/follow_joint_trajectory", [25, 0 , 15, 0])
-	# Here we initiate the movement of the arm
-	node.send_command()
-
-def move_robotic_arm(xpos_ypos_zpos_angle):
-    # Here we instanciate the new class
-	node = MoveRobot("/arm_controller/follow_joint_trajectory", xpos_ypos_zpos_angle)
-	# Here we initiate the movement of the arm
-	node.send_command()
-
 def open_gripper():
 	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
 	pub.publish(0)
@@ -116,4 +88,21 @@ def open_gripper():
 def close_gripper():	
 	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
 	pub.publish(6)
-	
+
+def standard_position():
+	node = MoveRobot("/arm_controller/follow_joint_trajectory", [25, 0 , 15, 0])
+	# Here we initiate the movement of the arm
+	node.send_command()
+
+def pick_up(x_y_z_angle):
+	standard_position()
+	open_gripper()
+	node = MoveRobot("/arm_controller/follow_joint_trajectory", x_y_z_angle)
+	node.send_command()
+	close_gripper()
+
+def deliver(x_y_z_angle):
+	standard_position()
+	node = MoveRobot("/arm_controller/follow_joint_trajectory", x_y_z_angle)
+	node.send_command()
+	open_gripper()
