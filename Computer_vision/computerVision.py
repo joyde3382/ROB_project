@@ -192,8 +192,11 @@ class Brick(object):
 
         tempCenter = [0] * 2
 
-        tempCenter[0] = center[0] - 286 # Xcoord offset
-        tempCenter[1] = 301 - center[1] # Ycoord offset
+        #286
+        # 301
+
+        tempCenter[0] = center[0] - 300 # Xcoord offset
+        tempCenter[1] = 320 - center[1] # Ycoord offset
 
         self.centerFromRobot = tempCenter
 
