@@ -11,6 +11,7 @@ from trajectory_msgs.msg import JointTrajectoryPoint
 from trajectory_msgs.msg import JointTrajectory
 import math
 import sys
+import time
 from std_msgs.msg import Float64
 
 def lim(n):
@@ -28,20 +29,24 @@ def invkin(xyz):
 
 	# # -1.919 is equals to 110 deg
 	q1 = lim(math.atan2(yc, xc))
+	# q1 = math.atan2(yc, xc)
 	
 	r2 = (xc - a1*math.cos(q1))**2 + (yc - a1*math.sin(q1))**2
 	s = (zc - d1)
 	D = ( r2 + math.pow(s,2) - math.pow(a2,2) - math.pow(d4,2))/(2*a2*d4)
 
 	q3 = lim(math.atan2(-math.sqrt(1-math.pow(D,2)), D))
+	print "%.2f & %.2f & %.2f" % (D, r2, q1)
+	# q3 = math.atan2(-math.sqrt(1-math.pow(D,2)), D)
 
-	q2 = lim(math.atan2(s, math.sqrt(r2)) - math.atan2(d4*math.sin(q3), a2 + d4*math.cos(q3))-(math.pi/4))
-
+	q2 = lim(math.atan2(s, math.sqrt(r2)) - math.atan2(d4*math.sin(q3), a2 + d4*math.cos(q3)))
+	# q2 = math.atan2(s, math.sqrt(r2)) - math.atan2(d4*math.sin(q3), a2 + d4*math.cos(q3))
+	
 	q4 = xyz[3]
 
 	print "q1:" + str(math.degrees(q1)) + ", q2: " + str(math.degrees(q2)) + ", q3: " + str(math.degrees(q3)) + ", q4: " + str(math.degrees(q4));
-
-	return q1,q2,q3,q4
+	q2 = q2 - (math.pi/2);
+	return q1, q2, q3, q4
 
 class MoveRobot:
 
@@ -66,8 +71,8 @@ class MoveRobot:
 
 		# construct a list of joint positions by calling invkin for each xyz point
 		for p in xyz_positions:
-			jtp = JointTrajectoryPoint(positions=invkin(p),velocities=[0.5]*self.N_JOINTS ,time_from_start=dur)
-			dur += rospy.Duration(2)
+			jtp = JointTrajectoryPoint(positions=p,velocities=[0.5]*self.N_JOINTS ,time_from_start=dur)
+			dur += rospy.Duration(5)
 			self.joint_positions.append(jtp)
 
 		# Here the the movement path is defined
@@ -90,19 +95,28 @@ def close_gripper():
 	pub.publish(6)
 
 def standard_position():
-	node = MoveRobot("/arm_controller/follow_joint_trajectory", [25, 0 , 15, 0])
+	print "Moving to standard position"
+	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin([0, 0 , 30, 0]))
 	# Here we initiate the movement of the arm
 	node.send_command()
 
 def pick_up(x_y_z_angle):
 	standard_position()
 	open_gripper()
-	node = MoveRobot("/arm_controller/follow_joint_trajectory", x_y_z_angle)
-	node.send_command()
+	print "Moving to brick location"
+	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
+	node.send_command();
+	time.sleep(2)
 	close_gripper()
 
 def deliver(x_y_z_angle):
 	standard_position()
-	node = MoveRobot("/arm_controller/follow_joint_trajectory", x_y_z_angle)
-	node.send_command()
+	print "Moving to delivery location"
+	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
+	node.send_command();
+	time.sleep(1)
 	open_gripper()
+
+def move_arm(x_y_z_angle):
+	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
+	node.send_command();
