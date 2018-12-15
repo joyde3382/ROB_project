@@ -11,12 +11,46 @@ import sys
 from std_msgs.msg import Float64
 from move_robot import *
 
+
+
+import cPickle
+import os
+import re
+import json
+
+
+#communicate with another process through named pipe
+#one for receive command, the other for send command
+rfPath = "./Computer_vision/p1"
+
+rp = open(rfPath, 'r')
+response = rp.read()
+#print "P2 hear %s" % response
+rp.close()
+
+
+#y = json.dumps(response)
+y = json.loads(response)
+
+# the result is a Python dictionary:
+
+yellow = y["Yellow"]
+Blue = y["Blue"]
+
+bcords = Blue["center"]
+ycords = yellow["center"]
+
 def MainRobot():
     moreBlocks = True
     while moreBlocks == True:
         # for each coordinate
-        pick_up([0,0,0,0])
-        deliver([1,1,1,1])
+        for x in bcords:
+			pick_up([0,0,0,0])
+			deliver([1,1,1,1])
+ 
+        for x in ycords:
+			pick_up([0,0,0,0])
+			deliver([1,1,1,1])
         
         ## end
         moreBlocks = false

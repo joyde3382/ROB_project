@@ -287,9 +287,9 @@ vision.show_bricks(image,yellow_bricks,(0,255,255), 'Yellow')
 # centerX = 295, centerY = 310
 
 
-bcenter = []
-bangle = []
-barea = []
+bcenter = [""]
+bangle = [""]
+barea = [""]
 
 
 for b in blue_bricks:
@@ -303,9 +303,9 @@ for b in blue_bricks:
     barea.append(area)
     print 'Blue object(x,y) ' + ':' + str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
     
-ycenter = []
-yangle = []
-yarea = []
+ycenter = [""]
+yangle = [""]
+yarea = [""]
 
 for b in yellow_bricks:
 
