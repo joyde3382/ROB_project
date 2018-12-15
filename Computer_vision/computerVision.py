@@ -59,7 +59,6 @@ class computerVision:
             epsilon = 0.04*cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,epsilon,True) 
             
-            # if len(approx) > 3 or len(approx) < 5 :
             if len(approx) == 4:
                 rect = cv2.minAreaRect(approx)
                 area = cv2.contourArea(approx)
@@ -79,25 +78,22 @@ class computerVision:
                     brick.set_box(box)
 
                     bricks.append(brick)
-            # elif len(approx) > 4:
-            #     (x,y),radius = cv2.minEnclosingCircle(cnt)
-            #     center = (int(x),int(y))
-            #     radius = int(radius)
-            #     area = radius*radius*math.pi
+            elif len(approx) > 4:
+                (x,y),radius = cv2.minEnclosingCircle(cnt)
+                center = (int(x),int(y))
+                radius = int(radius)
+                area = radius*radius*math.pi
 
-            #     if area > 600 and area < 2000:
+                if area > 600 and area < 2000:
 
-            #         brick = Brick()
-            #         area = np.int0(area)
+                    brick = Brick()
+                    area = np.int0(area)
                 
-            #         brick.set_area(area)
-            #         brick.set_center(center)
-            #         brick.set_radius(radius)
-            #         # brick.set_center(center)
-            #         # brick.set_angle(0)
-            #         # brick.set_box(0)
+                    brick.set_area(area)
+                    brick.set_center(center)
+                    brick.set_radius(radius)
 
-            #         bricks.append(brick)
+                    bricks.append(brick)
 
         
                 
@@ -166,24 +162,20 @@ class computerVision:
         return self.get_bricks(cont)
 
     def show_bricks(self, image,bricks,color, colorName):
-        # brick_iter = iter(bricks)
+
         for b in bricks:
 
             box = b.box
             cX = b.get_centerFromImage()[0] 
             cY = b.get_centerFromImage()[1]
 
-
             if len(box) == 0:
                 cv2.circle(image,b.get_centerFromImage(),b.get_radius(),color,2)
             else:
                 cv2.drawContours(image,[box],0,color,2)
-            
-            
 
             brickName = str(colorName) + str(bricks.index(b))
 
-            
             cv2.putText(image, brickName, (cX, cY - 30), cv2.FONT_HERSHEY_SIMPLEX,
             0.5, (255, 255, 255), 2)
         
@@ -204,11 +196,8 @@ class Brick(object):
 
         tempCenter = [0] * 2
 
-        #286
-        # 301
-
-        tempCenter[0] = center[0] - 300 # Xcoord offset
-        tempCenter[1] = 320 - center[1] # Ycoord offset
+        tempCenter[0] = center[0] - 305 # Xcoord offset
+        tempCenter[1] = 313 - center[1] # Ycoord offset
 
         self.centerFromRobot = tempCenter
 
@@ -243,49 +232,33 @@ class Brick(object):
 
 vision = computerVision()
 
-image = vision.get_from_file('test4.jpg')
-image = vision.get_from_file('test5.jpg')
+# image = vision.get_from_file('test5.jpg')
+image = vision.get_from_webcam()
 
-image = vision.get_from_file('test5.jpg')
-#image = vision.get_from_webcam()
-
-# cap = cv2.VideoCapture(0)
-# _, image = cap.read()
-# image = image[100:450, 30:650] # crop_img = img[y:y+h, x:x+w]
-image = image[72:412, 30:630] # crop_img = img[y:y+h, x:x+w]
+image = image[70:410, 25:635] # crop_img = img[y:y+h, x:x+w]
 
 hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 # hsv hue sat value
-
-
 # this one works quite fine
 ###################
 
-lower_blue = np.array([70,50,50])
+lower_blue = np.array([110,80,80])
 upper_blue = np.array([190,255,255])
 
 lower_yellow = np.array([15,100,50])
 upper_yellow = np.array([50,255,255])
 
-# lower_red = np.array([0,75,100])
-# upper_red = np.array([23,255,225])
+# lower_red = np.array([0,75,50])
+# upper_red = np.array([23,255,255])
 
 ####################
 
-
 blue_bricks = vision.do_full(image,hsv,upper_blue,lower_blue, True)
 yellow_bricks = vision.do_full(image,hsv,upper_yellow,lower_yellow)
-# red_bricks = vision.do_full(image,hsv,upper_red,lower_red, True)
-# red_bricksHigh = vision.do_full(image,hsv,upper_redHigh,lower_redHigh)
 
 vision.show_bricks(image,blue_bricks,(255,0,0), 'Blue')
 vision.show_bricks(image,yellow_bricks,(0,255,255), 'Yellow')
-# vision.show_bricks(image,red_bricks,(0,0,255), 'Red')
-# vision.show_bricks(image,red_bricksHigh,(0,0,255), 'RedHigh')
-
-# centerX = 295, centerY = 310
-
 
 bcenter = []
 bangle = []
@@ -316,30 +289,8 @@ for b in yellow_bricks:
     ycenter.append(center)
     yangle.append(angle)
     yarea.append(area)
-    # center = find_center_coordinate(
 
     print 'Yellow object ' + ':' +  str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
-    
-# for b in red_bricks:
-
-#     center = b.get_centerFromRobot()
-#     angle = b.angle
-#     area = b.area
-#     # center = find_center_coordinate(b[0],b[2])
-
-#     print 'Red object ' + ':' +  str(center) + ' //// angle: ' + str(angle)  + ' //// area: ' + str(area) 
-
-# for b in red_bricks2:
-
-#     center = b.get_centerFromRobot()
-#     angle = b.angle
-#     area = b.area
-#     # center = find_center_coordinate(b[0],b[2])
-
-#     print 'Red2 object ' + ':' +  str(center) + ' //// angle: ' + str(angle)  + ' //// area: ' + str(area) 
-
-
-
 
 wfPath = "./p1"
 wp = open(wfPath, 'w')
