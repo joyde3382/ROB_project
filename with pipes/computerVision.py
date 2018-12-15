@@ -3,11 +3,19 @@ import cv2
 import urllib
 import numpy as np
 import math
-import json 
 # pipes
 import cPickle
 import os
+import json
 # pipes 
+rfPath = "./p1"
+wfPath = "./p2"
+
+try:
+    os.mkfifo(wfPath)
+    os.mkfifo(rfPath)
+except OSError:
+    pass
 
 class computerVision:
 
@@ -51,13 +59,14 @@ class computerVision:
             epsilon = 0.04*cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,epsilon,True) 
             
+            # if len(approx) > 3 or len(approx) < 5 :
             if len(approx) == 4:
                 rect = cv2.minAreaRect(approx)
                 area = cv2.contourArea(approx)
                 box = cv2.boxPoints(rect)
                 box = np.int0(box)
 
-                if area > 600 and area < 5000:
+                if area > 600 and area < 4000:
 
                     brick = Brick()
                     area = np.int0(area)
@@ -70,25 +79,25 @@ class computerVision:
                     brick.set_box(box)
 
                     bricks.append(brick)
-            elif len(approx) > 4:
-                (x,y),radius = cv2.minEnclosingCircle(cnt)
-                center = (int(x),int(y))
-                radius = int(radius)
-                area = radius*radius*math.pi
+            # elif len(approx) > 4:
+            #     (x,y),radius = cv2.minEnclosingCircle(cnt)
+            #     center = (int(x),int(y))
+            #     radius = int(radius)
+            #     area = radius*radius*math.pi
 
-                if area > 600 and area < 2000:
+            #     if area > 600 and area < 2000:
 
-                    brick = Brick()
-                    area = np.int0(area)
+            #         brick = Brick()
+            #         area = np.int0(area)
                 
-                    brick.set_area(area)
-                    brick.set_center(center)
-                    brick.set_radius(radius)
-                    # brick.set_center(center)
-                    # brick.set_angle(0)
-                    # brick.set_box(0)
+            #         brick.set_area(area)
+            #         brick.set_center(center)
+            #         brick.set_radius(radius)
+            #         # brick.set_center(center)
+            #         # brick.set_angle(0)
+            #         # brick.set_box(0)
 
-                    bricks.append(brick)
+            #         bricks.append(brick)
 
         
                 
@@ -104,7 +113,7 @@ class computerVision:
         mask = cv2.inRange(hsv, lower, upper)
         res = cv2.bitwise_and(image,image, mask= mask)
 
-        res = cv2.medianBlur(res, 9)
+        res = cv2.medianBlur(res, 5)
         return res
 
     def threshold_image(self, image,debug=False):
@@ -195,8 +204,11 @@ class Brick(object):
 
         tempCenter = [0] * 2
 
-        tempCenter[0] = center[0] - 295 # Xcoord offset
-        tempCenter[1] = 310 - center[1] # Ycoord offset
+        #286
+        # 301
+
+        tempCenter[0] = center[0] - 300 # Xcoord offset
+        tempCenter[1] = 320 - center[1] # Ycoord offset
 
         self.centerFromRobot = tempCenter
 
@@ -231,65 +243,53 @@ class Brick(object):
 
 vision = computerVision()
 
-# image = vision.get_from_file('test4.jpg')
-# image = vision.get_from_file('test5.jpg')
+image = vision.get_from_file('test4.jpg')
+image = vision.get_from_file('test5.jpg')
 
 image = vision.get_from_file('test5.jpg')
-# image = vision.get_from_webcam()
+#image = vision.get_from_webcam()
 
 # cap = cv2.VideoCapture(0)
 # _, image = cap.read()
 # image = image[100:450, 30:650] # crop_img = img[y:y+h, x:x+w]
-image = image[50:450, 30:650] # crop_img = img[y:y+h, x:x+w]
+image = image[72:412, 30:630] # crop_img = img[y:y+h, x:x+w]
 
 hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 # hsv hue sat value
 
 
-lower_blue = np.array([100,150,150])
-upper_blue = np.array([190,255,255])
-
-lower_yellow = np.array([25,100,50])    
-upper_yellow = np.array([50,255,230])
-
-lower_red = np.array([0,75,75])
-upper_red = np.array([15,255,255])
-
-lower_redHigh = np.array([200,125,125])
-upper_redHigh = np.array([255,255,255])
-
-
 # this one works quite fine
 ###################
 
-# lower_blue = np.array([50,150,100])
-# upper_blue = np.array([160,255,200])
+lower_blue = np.array([70,50,50])
+upper_blue = np.array([190,255,255])
 
-# lower_yellow = np.array([10,100,50])
-# upper_yellow = np.array([50,255,230])
+lower_yellow = np.array([15,100,50])
+upper_yellow = np.array([50,255,255])
 
-# lower_red = np.array([0,75,150])
-# upper_red = np.array([25,255,255])
+# lower_red = np.array([0,75,100])
+# upper_red = np.array([23,255,225])
 
 ####################
 
 
 blue_bricks = vision.do_full(image,hsv,upper_blue,lower_blue, True)
 yellow_bricks = vision.do_full(image,hsv,upper_yellow,lower_yellow)
-red_bricks = vision.do_full(image,hsv,upper_red,lower_red)
-red_bricksHigh = vision.do_full(image,hsv,upper_redHigh,lower_redHigh)
+# red_bricks = vision.do_full(image,hsv,upper_red,lower_red, True)
+# red_bricksHigh = vision.do_full(image,hsv,upper_redHigh,lower_redHigh)
 
 vision.show_bricks(image,blue_bricks,(255,0,0), 'Blue')
 vision.show_bricks(image,yellow_bricks,(0,255,255), 'Yellow')
-vision.show_bricks(image,red_bricks,(0,0,255), 'Red')
-vision.show_bricks(image,red_bricksHigh,(0,0,255), 'RedHigh')
+# vision.show_bricks(image,red_bricks,(0,0,255), 'Red')
+# vision.show_bricks(image,red_bricksHigh,(0,0,255), 'RedHigh')
 
 # centerX = 295, centerY = 310
 
-bcenter [0]
-#bangle [0]
-#area [0]
+
+bcenter = [""]
+bangle = [""]
+barea = [""]
 
 
 for b in blue_bricks:
@@ -297,99 +297,38 @@ for b in blue_bricks:
     center = b.get_centerFromRobot()
     angle = b.angle
     area = b.area
-	
-#bcenter.append(center)
-#bangle.append(angle)
-#area.append(area)
-
-    print 'Blue object(x,y) ' + ':' + str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
-#wp.write('Blue object(x,y) ' + ':' + str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) + ' //// ')		
     
-
-
-
-
+    bcenter.append(center)
+    bangle.append(angle)
+    barea.append(area)
+    print 'Blue object(x,y) ' + ':' + str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
+    
+ycenter = [""]
+yangle = [""]
+yarea = [""]
 
 for b in yellow_bricks:
 
-    center2 = b.get_centerFromRobot()
-    angle2 = b.angle
-    area2 = b.area
+    center = b.get_centerFromRobot()
+    angle = b.angle
+    area = b.area
+    
+    ycenter.append(center)
+    yangle.append(angle)
+    yarea.append(area)
     # center = find_center_coordinate(
 
     print 'Yellow object ' + ':' +  str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
-
-#wp.write('Yellow object ' + ':' +  str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) + ' //// ')		
-
-
     
-for b in red_bricks:
+# for b in red_bricks:
 
-    center3 = b.get_centerFromRobot()
-    angle3 = b.angle
-    area3 = b.area
-    # center = find_center_coordinate(b[0],b[2])
+#     center = b.get_centerFromRobot()
+#     angle = b.angle
+#     area = b.area
+#     # center = find_center_coordinate(b[0],b[2])
 
-    print 'Red object ' + ':' +  str(center) + ' //// angle: ' + str(angle)  + ' //// area: ' + str(area) 
+#     print 'Red object ' + ':' +  str(center) + ' //// angle: ' + str(angle)  + ' //// area: ' + str(area) 
 
-wfPath = "./p1"
-wp = open(wfPath, 'w')
-
-
-
-x = {
-"Blue": {
-  "center": bcenter[0],
-  "angle": bangle[0],
-  "area": area[0]
-  },
-  "Blue2": {
-  "center": bcenter[1],
-  "angle": bangle[1],
-  "area": area[1]
-  },
-  "Yellow": {
-  "center": center2,
-  "angle": angle2,
-  "area": area2
-  },
-    "Red": {
-  "center": center3,
-  "angle": angle3,
-  "area": area3
-  }
-}
-
-
-x = {
-"Blue": {
-  "center": center,
-  "angle": angle,
-  "area": area
-  },
-  "Yellow": {
-  "center": center2,
-  "angle": angle2,
-  "area": area2
-  },
-    "Red": {
-  "center": center3,
-  "angle": angle3,
-  "area": area3
-  }
-}
-
-
-
-#sam = str(x)+str(y)+str(z)
-y = json.dumps(x)
-
-
-wp.write(y)
-wp.close()
-
-#wp.write('Red object ' + ':' +  str(center) + ' //// angle: ' + str(angle)  + ' //// area: ' + str(area)  + ' //// ')		
-#wp.close()
 # for b in red_bricks2:
 
 #     center = b.get_centerFromRobot()
@@ -398,6 +337,36 @@ wp.close()
 #     # center = find_center_coordinate(b[0],b[2])
 
 #     print 'Red2 object ' + ':' +  str(center) + ' //// angle: ' + str(angle)  + ' //// area: ' + str(area) 
+
+
+
+
+wfPath = "./p1"
+wp = open(wfPath, 'w')
+
+
+
+x = {
+"Blue": {
+  "center": bcenter,
+  "angle": bangle,
+  "area": barea
+  },
+  "Yellow": {
+  "center": ycenter,
+  "angle": yangle,
+  "area": yarea
+  },
+}
+
+
+y = json.dumps(x)
+
+
+wp.write(y)
+wp.close()
+
+
 
 cv2.imshow('result',image)
 cv2.imwrite('result.jpg',image)

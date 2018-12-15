@@ -6,7 +6,16 @@ import math
 # pipes
 import cPickle
 import os
+import json
 # pipes 
+rfPath = "./p1"
+wfPath = "./p2"
+
+try:
+    os.mkfifo(wfPath)
+    os.mkfifo(rfPath)
+except OSError:
+    pass
 
 class computerVision:
 
@@ -234,11 +243,11 @@ class Brick(object):
 
 vision = computerVision()
 
-# image = vision.get_from_file('test4.jpg')
-# image = vision.get_from_file('test5.jpg')
+image = vision.get_from_file('test4.jpg')
+image = vision.get_from_file('test5.jpg')
 
-# image = vision.get_from_file('test5.jpg')
-image = vision.get_from_webcam()
+image = vision.get_from_file('test5.jpg')
+#image = vision.get_from_webcam()
 
 # cap = cv2.VideoCapture(0)
 # _, image = cap.read()
@@ -277,20 +286,36 @@ vision.show_bricks(image,yellow_bricks,(0,255,255), 'Yellow')
 
 # centerX = 295, centerY = 310
 
+
+bcenter = []
+bangle = []
+barea = []
+
+
 for b in blue_bricks:
 
     center = b.get_centerFromRobot()
     angle = b.angle
     area = b.area
-
+    
+    bcenter.append(center)
+    bangle.append(angle)
+    barea.append(area)
     print 'Blue object(x,y) ' + ':' + str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
     
+ycenter = []
+yangle = []
+yarea = []
 
 for b in yellow_bricks:
 
     center = b.get_centerFromRobot()
     angle = b.angle
     area = b.area
+    
+    ycenter.append(center)
+    yangle.append(angle)
+    yarea.append(area)
     # center = find_center_coordinate(
 
     print 'Yellow object ' + ':' +  str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
@@ -314,9 +339,6 @@ for b in yellow_bricks:
 #     print 'Red2 object ' + ':' +  str(center) + ' //// angle: ' + str(angle)  + ' //// area: ' + str(area) 
 
 
-bcenter [0]
-bangle [0]
-area [0]
 
 
 wfPath = "./p1"
@@ -326,49 +348,18 @@ wp = open(wfPath, 'w')
 
 x = {
 "Blue": {
-  "center": bcenter[0],
-  "angle": bangle[0],
-  "area": area[0]
-  },
-  "Blue2": {
-  "center": bcenter[1],
-  "angle": bangle[1],
-  "area": area[1]
+  "center": bcenter,
+  "angle": bangle,
+  "area": barea
   },
   "Yellow": {
-  "center": center2,
-  "angle": angle2,
-  "area": area2
+  "center": ycenter,
+  "angle": yangle,
+  "area": yarea
   },
-    "Red": {
-  "center": center3,
-  "angle": angle3,
-  "area": area3
-  }
 }
 
 
-x = {
-"Blue": {
-  "center": center,
-  "angle": angle,
-  "area": area
-  },
-  "Yellow": {
-  "center": center2,
-  "angle": angle2,
-  "area": area2
-  },
-    "Red": {
-  "center": center3,
-  "angle": angle3,
-  "area": area3
-  }
-}
-
-
-
-#sam = str(x)+str(y)+str(z)
 y = json.dumps(x)
 
 
