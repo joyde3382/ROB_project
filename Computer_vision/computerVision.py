@@ -295,8 +295,6 @@ for b in yellow_bricks:
 wfPath = "./p1"
 wp = open(wfPath, 'w')
 
-
-
 x = {
 "Blue": {
   "center": bcenter,
