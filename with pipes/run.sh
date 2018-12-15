@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 python computerVision.py 
-x-terminal-emulator -e python robot.py
+python read.py

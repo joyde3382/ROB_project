@@ -9,10 +9,8 @@ import os
 import json
 # pipes 
 rfPath = "./p1"
-wfPath = "./p2"
 
 try:
-    os.mkfifo(wfPath)
     os.mkfifo(rfPath)
 except OSError:
     pass
@@ -254,7 +252,7 @@ upper_yellow = np.array([50,255,255])
 
 ####################
 
-blue_bricks = vision.do_full(image,hsv,upper_blue,lower_blue, True)
+blue_bricks = vision.do_full(image,hsv,upper_blue,lower_blue)
 yellow_bricks = vision.do_full(image,hsv,upper_yellow,lower_yellow)
 
 vision.show_bricks(image,blue_bricks,(255,0,0), 'Blue')
@@ -293,6 +291,10 @@ for b in yellow_bricks:
     print 'Yellow object ' + ':' +  str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
 
 wfPath = "./p1"
+wp = open(wfPath, 'w')
+wp.write("")
+wp.close()
+
 wp = open(wfPath, 'w')
 
 x = {

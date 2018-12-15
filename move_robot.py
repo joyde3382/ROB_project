@@ -72,7 +72,7 @@ class MoveRobot:
 		# construct a list of joint positions by calling invkin for each xyz point
 		for p in xyz_positions:
 			jtp = JointTrajectoryPoint(positions=p,velocities=[0.5]*self.N_JOINTS ,time_from_start=dur)
-			dur += rospy.Duration(5)
+			dur += rospy.Duration(2)
 			self.joint_positions.append(jtp)
 
 		# Here the the movement path is defined
@@ -89,7 +89,6 @@ class MoveRobot:
 def open_gripper():
 	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
 	pub.publish(0)
-	time.sleep(1)
 
 def close_gripper():	
 	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
@@ -103,7 +102,7 @@ def standard_position():
 	node.send_command()
 
 def pick_up(x_y_z_angle):
-	standard_position()
+	# standard_position()
 	open_gripper()
 	print "Moving to brick location"
 	
@@ -112,7 +111,7 @@ def pick_up(x_y_z_angle):
 	move_arm(arrList)
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
 	node.send_command()
-	time.sleep(2)
+	# time.sleep(1)
 	close_gripper()
 
 def deliver(x_y_z_angle):
