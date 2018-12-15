@@ -29,5 +29,6 @@ print(Blue["center"])
 
 center = Blue["center"]
 
-print(len(center))
- 
+
+for x in center:
+	print(x)

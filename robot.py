@@ -37,14 +37,20 @@ y = json.loads(response)
 yellow = y["Yellow"]
 Blue = y["Blue"]
 
-
+bcords = Blue["center"]
+ycords = yellow["center"]
 
 def MainRobot():
     moreBlocks = True
     while moreBlocks == True:
         # for each coordinate
-        pick_up([0,0,0,0])
-        deliver([1,1,1,1])
+        for x in bcords:
+			pick_up([0,0,0,0])
+			deliver([1,1,1,1])
+ 
+        for x in ycords:
+			pick_up([0,0,0,0])
+			deliver([1,1,1,1])
         
         ## end
         moreBlocks = false
