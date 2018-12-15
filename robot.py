@@ -11,13 +11,10 @@ import sys
 from std_msgs.msg import Float64
 from move_robot import *
 
-
-
 import cPickle
 import os
 import re
 import json
-
 
 #communicate with another process through named pipe
 #one for receive command, the other for send command
@@ -27,7 +24,6 @@ rp = open(rfPath, 'r')
 response = rp.read()
 #print "P2 hear %s" % response
 rp.close()
-
 
 #y = json.dumps(response)
 y = json.loads(response)
@@ -43,23 +39,21 @@ ycords = yellow["center"]
 def MainRobot():
     moreBlocks = True
     while moreBlocks == True:
+        pickHeight = 6
+        xOffset = 8.564
+        yOffset = 8.702
         # for each coordinate
         for x in bcords:
-			pick_up([0,0,0,0])
-			deliver([1,1,1,1])
- 
+                pick_up([float(x[1]/yOffset),-float(x[0]/xOffset),pickHeight,0])
+                deliver([20,0,pickHeight,0])
+
         for x in ycords:
-			pick_up([0,0,0,0])
-			deliver([1,1,1,1])
+                pick_up([float(x[1]/yOffset),-float(x[0]/xOffset),pickHeight,0])
+                deliver([20,0,pickHeight,0])
         
-        ## end
         moreBlocks = false
     
-
 if __name__ == "__main__":
         rospy.init_node("robot")
-        coords = [-132,229]
-        x_koor = float(coords[0]/8.6076)
-        y_koor = float(coords[1]/8.5714)
-        pick_up([y_koor,-x_koor,0,0])
-        deliver([20,0,4,0])
+
+

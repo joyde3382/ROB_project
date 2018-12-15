@@ -21,8 +21,8 @@ def lim(n):
 def invkin(xyz):
 	d1 = 16.8; # cm (height of 2nd joint)
 	a1 = 0; # (distance along "y-axis" to 2nd joint)
-	a2 = 19.2; # (distance between 2nd and 3rd joints)
-	d4 = 23.5; # (distance from 3rd joint to gripper center - all inclusive, ie. also 4th joint)
+	a2 = 17.3; # (distance between 2nd and 3rd joints)
+	d4 = 20.5; # (distance from 3rd joint to gripper center - all inclusive, ie. also 4th joint)
 
 	# Insert code here!!!
 	xc = xyz[0]; yc = xyz[1]; zc = xyz[2]
@@ -96,7 +96,7 @@ def close_gripper():
 
 def standard_position():
 	print "Moving to standard position"
-	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin([0, 0 , 30, 0]))
+	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin([15, 0 , 50, 0]))
 	# Here we initiate the movement of the arm
 	node.send_command()
 
@@ -104,6 +104,10 @@ def pick_up(x_y_z_angle):
 	standard_position()
 	open_gripper()
 	print "Moving to brick location"
+	
+	arrList = [x_y_z_angle[0], x_y_z_angle[1]-5, 15, x_y_z_angle[3]];
+
+	move_arm(arrList)
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
 	node.send_command();
 	time.sleep(2)
