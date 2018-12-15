@@ -43,6 +43,7 @@ def MainRobot():
         xOffset = 8.564
         yOffset = 8.702
         # for each coordinate
+        # if (bcords not)
         for x in bcords:
                 pick_up([float(x[1]/yOffset),-float(x[0]/xOffset),pickHeight,0])
                 deliver([20,0,pickHeight,0])
@@ -55,5 +56,7 @@ def MainRobot():
     
 if __name__ == "__main__":
         rospy.init_node("robot")
+        MainRobot()
+        
 
 
