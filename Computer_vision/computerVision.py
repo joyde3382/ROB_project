@@ -321,9 +321,9 @@ wp.close()
 
 cv2.imshow('result',image)
 cv2.imwrite('result.jpg',image)
-while True:
-    c = cv2.waitKey(5)
-    if c != -1:
-        cv2.destroyAllWindows()
-        exit(0)
+# while True:
+#     c = cv2.waitKey(5)
+#     if c != -1:
+#         cv2.destroyAllWindows()
+#         exit(0)
 

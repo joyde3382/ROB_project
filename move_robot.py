@@ -44,8 +44,8 @@ def invkin(xyz):
 	
 	q4 = xyz[3]
 
-	print "q1:" + str(math.degrees(q1)) + ", q2: " + str(math.degrees(q2)) + ", q3: " + str(math.degrees(q3)) + ", q4: " + str(math.degrees(q4));
-	q2 = q2 - (math.pi/2);
+	print "q1:" + str(math.degrees(q1)) + ", q2: " + str(math.degrees(q2)) + ", q3: " + str(math.degrees(q3)) + ", q4: " + str(math.degrees(q4))
+	q2 = q2 - (math.pi/2)
 	return q1, q2, q3, q4
 
 class MoveRobot:
@@ -106,7 +106,7 @@ def pick_up(x_y_z_angle):
 	open_gripper()
 	print "Moving to brick location"
 	
-	arrList = [x_y_z_angle[0], x_y_z_angle[1]-5, 15, x_y_z_angle[3]];
+	arrList = [x_y_z_angle[0], x_y_z_angle[1]-5, 15, x_y_z_angle[3]]
 
 	move_arm(arrList)
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))

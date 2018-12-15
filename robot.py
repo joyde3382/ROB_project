@@ -47,11 +47,11 @@ def MainRobot():
         # if (bcords not)
         for x in bcords:
                 pick_up([float(x[1]/yOffset),-float(x[0]/xOffset),pickHeight,0])
-                deliver([20,0,deliverHeight,0])
+                deliver([12,18,deliverHeight,0])
 
         for x in ycords:
                 pick_up([float(x[1]/yOffset),-float(x[0]/xOffset),pickHeight,0])
-                deliver([20,0,deliverHeight,0])
+                deliver([12,-18,deliverHeight,0])
         
         moreBlocks = false
     
