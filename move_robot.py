@@ -89,10 +89,12 @@ class MoveRobot:
 def open_gripper():
 	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
 	pub.publish(0)
+	time.sleep(1)
 
 def close_gripper():	
 	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
 	pub.publish(6)
+	time.sleep(1)
 
 def standard_position():
 	print "Moving to standard position"
@@ -109,7 +111,7 @@ def pick_up(x_y_z_angle):
 
 	move_arm(arrList)
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
-	node.send_command();
+	node.send_command()
 	time.sleep(2)
 	close_gripper()
 
@@ -117,10 +119,10 @@ def deliver(x_y_z_angle):
 	standard_position()
 	print "Moving to delivery location"
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
-	node.send_command();
+	node.send_command()
 	time.sleep(1)
 	open_gripper()
 
 def move_arm(x_y_z_angle):
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
-	node.send_command();
+	node.send_command()
