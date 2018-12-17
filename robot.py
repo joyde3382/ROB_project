@@ -10,7 +10,7 @@ import math
 import sys
 from std_msgs.msg import Float64
 from move_robot import *
-
+from std_msgs.msg import String
 import cPickle
 import os
 import re
@@ -18,23 +18,61 @@ import json
 
 #communicate with another process through named pipe
 #one for receive command, the other for send command
-rfPath = "./Computer_vision/p1"
+#rfPath = "./Computer_vision/p1"
 
-rp = open(rfPath, 'r')
-response = rp.read()
+#rp = open(rfPath, 'r')
+#response = rp.read()
 #print "P2 hear %s" % response
-rp.close()
+#rp.close()
 
 #y = json.dumps(response)
-y = json.loads(response)
+#y = json.loads(response)
 
 # the result is a Python dictionary:
 
-yellow = y["Yellow"]
-Blue = y["Blue"]
+#yellow = y["Yellow"]
+#Blue = y["Blue"]
 
-bcords = Blue["center"]
-ycords = yellow["center"]
+#bcords = Blue["center"]
+#ycords = yellow["center"]
+
+
+
+yellow = []
+Blue = []
+
+bcords = []
+ycords = []
+def callback(data):
+   #rospy.loginfo(data.data)
+    #y = json.dumps(response)
+   y = json.loads(data.data)
+    # the result is a Python dictionary:
+  #  print(y)
+  #  print(y["Yellow"])
+   yellow = y["Yellow"]
+   Blue = y["Blue"]
+   global bcords
+   global ycords
+   bcords = Blue["center"]
+   ycords = yellow["center"]
+
+    
+def listener():
+
+    # In ROS, nodes are uniquely named. If two nodes with the same
+    # name are launched, the previous one is kicked off. The
+    # anonymous=True flag means that rospy will choose a unique
+    # name for our 'listener' node so that multiple listeners can
+    # run simultaneously.
+    rospy.init_node('listener', anonymous=True)
+    rate = rospy.Rate(1) # 10hz
+    for x in range(10):
+		rospy.Subscriber("chatter", String, callback)
+		rate.sleep()
+
+
+
 
 def MainRobot():
     moreBlocks = True
@@ -60,6 +98,8 @@ def MainRobot():
         moreBlocks = false
     
 if __name__ == "__main__":
+        listener()
+        print(bcords)
         rospy.init_node("robot")
         MainRobot()
         

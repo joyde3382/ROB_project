@@ -290,12 +290,12 @@ for b in yellow_bricks:
 
     print 'Yellow object ' + ':' +  str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
 
-wfPath = "./p1"
-wp = open(wfPath, 'w')
-wp.write("")
-wp.close()
+#wfPath = "./p1"
+#wp = open(wfPath, 'w')
+#wp.write("")
+#wp.close()
 
-wp = open(wfPath, 'w')
+#wp = open(wfPath, 'w')
 
 x = {
 "Blue": {
@@ -314,8 +314,30 @@ x = {
 y = json.dumps(x)
 
 
-wp.write(y)
-wp.close()
+#wp.write(y)
+#wp.close()
+
+
+import rospy
+from std_msgs.msg import String
+
+def talker():
+    pub = rospy.Publisher('chatter', String, queue_size=10)
+    rospy.init_node('talker', anonymous=True)
+    rate = rospy.Rate(1) # 10hz
+    for x in range(3):
+		hello_str = y
+		rospy.loginfo(hello_str)
+		pub.publish(hello_str)
+		rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        talker()
+    except rospy.ROSInterruptException:
+        pass
+
+
 
 
 

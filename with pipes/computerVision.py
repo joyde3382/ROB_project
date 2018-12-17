@@ -287,9 +287,9 @@ vision.show_bricks(image,yellow_bricks,(0,255,255), 'Yellow')
 # centerX = 295, centerY = 310
 
 
-bcenter = [""]
-bangle = [""]
-barea = [""]
+bcenter = []
+bangle = []
+barea = []
 
 
 for b in blue_bricks:
@@ -303,9 +303,9 @@ for b in blue_bricks:
     barea.append(area)
     print 'Blue object(x,y) ' + ':' + str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
     
-ycenter = [""]
-yangle = [""]
-yarea = [""]
+ycenter = []
+yangle = []
+yarea = []
 
 for b in yellow_bricks:
 
@@ -366,6 +366,24 @@ y = json.dumps(x)
 wp.write(y)
 wp.close()
 
+import rospy
+from std_msgs.msg import String
+
+def talker():
+    pub = rospy.Publisher('chatter', String, queue_size=10)
+    rospy.init_node('talker', anonymous=True)
+    rate = rospy.Rate(1) # 10hz
+    for x in range(3):
+		hello_str = y
+		rospy.loginfo(hello_str)
+		pub.publish(hello_str)
+		rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        talker()
+    except rospy.ROSInterruptException:
+        pass
 
 
 cv2.imshow('result',image)
