@@ -317,7 +317,7 @@ y = json.dumps(x)
 #wp.write(y)
 #wp.close()
 
-
+   #http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28python%29 is used 
 import rospy
 from std_msgs.msg import String
 

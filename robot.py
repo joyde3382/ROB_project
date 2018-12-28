@@ -57,7 +57,7 @@ def callback(data):
    bcords = Blue["center"]
    ycords = yellow["center"]
 
-    
+    #http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28python%29 is used 
 def listener():
 
     # In ROS, nodes are uniquely named. If two nodes with the same
