@@ -49,13 +49,13 @@ def MainRobot():
         for x in bcords:
                 pick_up([float(x[1]/yOffset),-float(x[0]/xOffset),pickHeight,0])
                 deliver([12,18,stackBlue,0])
-                stackBlue =stackBlue + 4
+                stackBlue =stackBlue + 3
 
         stackYellow = 3
         for x in ycords:
                 pick_up([float(x[1]/yOffset),-float(x[0]/xOffset),pickHeight,0])
                 deliver([12,-18,stackYellow,0])
-                stackYellow = stackYellow+4
+                stackYellow = stackYellow + 3
         
         moreBlocks = false
     

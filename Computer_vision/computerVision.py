@@ -117,11 +117,11 @@ class computerVision:
         combination of dilate and erode
         """
         ret,th1 = cv2.threshold(image,50,255,cv2.THRESH_BINARY)
-        if debug: cv2.imshow('th1',th1)
+        if debug: cv2.imwrite('debug_pics/threshold_binary.jpg',th1) #cv2.imshow('th1',th1)
         resdi = cv2.dilate(th1,np.ones((3,3),np.uint8))
-        if debug: cv2.imshow('dilated',resdi)
+        if debug: cv2.imwrite('debug_pics/dilated.jpg',resdi) #cv2.imshow('dilated',resdi)
         closing = cv2.morphologyEx(resdi, cv2.MORPH_CLOSE,np.ones((5,5),np.uint8))
-        if debug: cv2.imshow('closing',closing)
+        if debug: cv2.imwrite('debug_pics/closing.jpg',closing) # cv2.imshow('closing',closing)
 
         return closing
 
@@ -131,7 +131,7 @@ class computerVision:
         call findContours
         """
         imgray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-        if debug: cv2.imshow('gray_scale_contour',imgray)
+        if debug: cv2.imwrite('debug_pics/gray_scale_contour.jpg',imgray) # cv2.imshow('gray_scale_contour',imgray)
         im2, contours, hierarchy = cv2.findContours(imgray,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
         return contours,hierarchy
@@ -146,16 +146,18 @@ class computerVision:
         """
         single_color_img = self.extract_single_color_range(image,hsv,lower,upper)
         if debug:
-            cv2.imshow('single_color_img',single_color_img)
+            # cv2.imshow('single_color_img',single_color_img)
+            cv2.imwrite('debug_pics/single_color_img.jpg',single_color_img)
         single_channel = self.threshold_image(single_color_img,debug)
         if debug:
-            cv2.imshow('single_channel',single_channel)
+            # cv2.imshow('single_channel',single_channel)
+            cv2.imwrite('debug_pics/single_channel.jpg',single_channel)
         cont,hierarchy = self.contours(single_channel,debug)
 
         if debug:
             for i,cnt in enumerate(cont):
                 cv2.drawContours(single_channel,cont,i,(0,0,255),2)
-        if debug: cv2.imshow('contours',single_channel)
+        if debug: cv2.imwrite('debug_pics/contours.jpg',single_channel) #cv2.imshow('contours',single_channel)
 
         return self.get_bricks(cont)
 
@@ -230,10 +232,10 @@ class Brick(object):
 
 vision = computerVision()
 
-# image = vision.get_from_file('test5.jpg')
-image = vision.get_from_webcam()
+image = vision.get_from_file('test.jpg')
+# image = vision.get_from_webcam()
 
-image = image[70:410, 25:635] # crop_img = img[y:y+h, x:x+w]
+image = image[70:410, 25:615] # crop_img = img[y:y+h, x:x+w]
 
 hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -241,7 +243,7 @@ hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 # this one works quite fine
 ###################
 
-lower_blue = np.array([110,80,80])
+lower_blue = np.array([90,80,80])
 upper_blue = np.array([190,255,255])
 
 lower_yellow = np.array([15,100,50])
@@ -252,7 +254,7 @@ upper_yellow = np.array([50,255,255])
 
 ####################
 
-blue_bricks = vision.do_full(image,hsv,upper_blue,lower_blue)
+blue_bricks = vision.do_full(image,hsv,upper_blue,lower_blue, True)
 yellow_bricks = vision.do_full(image,hsv,upper_yellow,lower_yellow)
 
 vision.show_bricks(image,blue_bricks,(255,0,0), 'Blue')
@@ -320,10 +322,10 @@ wp.close()
 
 
 cv2.imshow('result',image)
-cv2.imwrite('result.jpg',image)
-# while True:
-#     c = cv2.waitKey(5)
-#     if c != -1:
-#         cv2.destroyAllWindows()
-#         exit(0)
+cv2.imwrite('debug_pics/result.jpg',image)
+while True:
+    c = cv2.waitKey(5)
+    if c != -1:
+        cv2.destroyAllWindows()
+        exit(0)
 
