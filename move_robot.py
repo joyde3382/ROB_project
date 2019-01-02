@@ -101,19 +101,24 @@ def close_gripper():
 def standard_position():
 	print "Moving to standard position"
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin([15, 0 , 50, 0]))
-	# Here we initiate the movement of the arm
 	node.send_command()
 
 def pick_up(x_y_z_angle):
+	# Move the gripper to standard position
 	standard_position()
-	open_gripper()
-	print "Moving to brick location"
-	
-	arrList = [x_y_z_angle[0], x_y_z_angle[1]-5, 15, x_y_z_angle[3]]
 
+	# While in standard position, open the gripper
+	open_gripper()
+	
+	# Hover above target location
+	arrList = [x_y_z_angle[0], x_y_z_angle[1]-5, 15, x_y_z_angle[3]]
 	move_arm(arrList)
+
+	# Initiate pickup
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
 	node.send_command()
+
+	# Wait 2 seconds, before closing the gripper
 	time.sleep(2)
 	close_gripper()
 
