@@ -17,10 +17,10 @@ def lim(n):
     return max(min(1.919, n), -1.919)
 
 def invkin(xyz):
-	d1 = 16.8; # cm (height of 2nd joint)
-	a1 = 0; # (distance along "y-axis" to 2nd joint)
-	a2 = 17.3; # (distance between 2nd and 3rd joints)
-	d4 = 20.5; # (distance from 3rd joint to gripper center - all inclusive, ie. also 4th joint)
+	d1 = 16.8 # cm (height of 2nd joint)
+	a1 = 0.0 # (distance along "y-axis" to 2nd joint)
+	a2 = 17.3 # (distance between 2nd and 3rd joints) (17,3)
+	d4 = 20.5 # (distance from 3rd joint to gripper center - all inclusive, ie. also 4th joint)
 
 	# Insert code here!!!
 	xc = xyz[0]; yc = xyz[1]; zc = xyz[2]
@@ -33,8 +33,10 @@ def invkin(xyz):
 	s = (zc - d1)
 	D = ( r2 + math.pow(s,2) - math.pow(a2,2) - math.pow(d4,2))/(2*a2*d4)
 
-	q3 = lim(math.atan2(-math.sqrt(1-math.pow(D,2)), D))
-	
+	q3 = lim(math.atan2(-1*math.sqrt(1-math.pow(D,2)), D))
+
+
+
 	print "%.2f & %.2f & %.2f" % (D, r2, q1)
 	# q3 = math.atan2(-math.sqrt(1-math.pow(D,2)), D)
 
@@ -45,6 +47,7 @@ def invkin(xyz):
 
 	print "q1:" + str(math.degrees(q1)) + ", q2: " + str(math.degrees(q2)) + ", q3: " + str(math.degrees(q3)) + ", q4: " + str(math.degrees(q4))
 	q2 = q2 - (math.pi/2)
+	q3 = q3 - (math.pi/18)
 	return q1, q2, q3, q4
 
 class MoveRobot:
@@ -66,7 +69,7 @@ class MoveRobot:
 				xpos_ypos_zpos_angle[3]
 				]
 			]		
-		dur = rospy.Duration(5)
+		dur = rospy.Duration(3)
 
 		# construct a list of joint positions by calling invkin for each xyz point
 		for p in xyz_positions:
@@ -86,12 +89,14 @@ class MoveRobot:
 		self.client.wait_for_result()
 
 def open_gripper():
+	time.sleep(1)
 	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
 	pub.publish(0)
 
 def close_gripper():	
 	pub = rospy.Publisher('gripper/command', Float64, queue_size=10)
 	pub.publish(6)
+	time.sleep(1)
 
 def standard_position():
 	print "Moving to standard position"
@@ -119,6 +124,7 @@ def deliver(x_y_z_angle):
 	node.send_command()
 	time.sleep(1)
 	open_gripper()
+	time.sleep(1)
 
 def move_arm(x_y_z_angle):
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))

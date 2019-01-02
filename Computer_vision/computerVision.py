@@ -113,7 +113,7 @@ class computerVision:
         such that small holes are filled. Afterwards the 'blobs' are closed using a
         combination of dilate and erode
         """
-        ret,th1 = cv2.threshold(image,150,255,cv2.THRESH_BINARY)
+        ret,th1 = cv2.threshold(image,155,255,cv2.THRESH_BINARY)
         if debug: cv2.imwrite('debug_pics/threshold_binary.jpg',th1) #cv2.imshow('th1',th1)
         resdi = cv2.dilate(th1,np.ones((7,7),np.uint8))
         if debug: cv2.imwrite('debug_pics/dilated.jpg',resdi) #cv2.imshow('dilated',resdi)
@@ -240,10 +240,10 @@ hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 # this one works quite fine
 ###################
 
-lower_blue = np.array([110,125,125])
+lower_blue = np.array([90,125,25])
 upper_blue = np.array([190,255,255])
 
-lower_yellow = np.array([15,155,125])
+lower_yellow = np.array([20,125,75])
 upper_yellow = np.array([50,255,255])
 
 # lower_blue = np.array([110,80,80])

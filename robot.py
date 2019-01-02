@@ -42,8 +42,8 @@ import json
 yellow = []
 Blue = []
 
-# bcords = []
-# ycords = []
+bcords = []
+ycords = []
 
 def callback(data):
    #rospy.loginfo(data.data)
@@ -86,7 +86,7 @@ def MainRobot():
         moreBlocks = True
         while moreBlocks == True:
                 pickHeight = 7
-                deliverHeight = 4
+                deliverHeight = 7
                 xOffset = 8.564
                 yOffset = 8.702
                 # for each coordinate
@@ -94,13 +94,13 @@ def MainRobot():
                 stackBlue = 3
                 for x in bcords:
                         pick_up([float(x[1]/yOffset),-float(x[0]/xOffset),pickHeight,0])
-                        deliver([12,18,stackBlue,0])
+                        deliver([8,20,stackBlue,0])
                         stackBlue =stackBlue + 4
 
                 stackYellow = 3
                 for x in ycords:
                         pick_up([float(x[1]/yOffset),-float(x[0]/xOffset),pickHeight,0])
-                        deliver([12,-18,stackYellow,0])
+                        deliver([8,-20,stackYellow,0])
                         stackYellow = stackYellow+4
                 
                 moreBlocks = False
