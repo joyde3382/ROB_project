@@ -116,7 +116,7 @@ class computerVision:
         such that small holes are filled. Afterwards the 'blobs' are closed using a
         combination of dilate and erode
         """
-        ret,th1 = cv2.threshold(image,50,255,cv2.THRESH_BINARY)
+        ret,th1 = cv2.threshold(image,150,255,cv2.THRESH_BINARY)
         if debug: cv2.imwrite('debug_pics/threshold_binary.jpg',th1) #cv2.imshow('th1',th1)
         resdi = cv2.dilate(th1,np.ones((3,3),np.uint8))
         if debug: cv2.imwrite('debug_pics/dilated.jpg',resdi) #cv2.imshow('dilated',resdi)
