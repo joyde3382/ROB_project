@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-
 import rospy
 import actionlib
 from control_msgs.msg import FollowJointTrajectoryAction
@@ -36,6 +34,7 @@ def invkin(xyz):
 	D = ( r2 + math.pow(s,2) - math.pow(a2,2) - math.pow(d4,2))/(2*a2*d4)
 
 	q3 = lim(math.atan2(-math.sqrt(1-math.pow(D,2)), D))
+	
 	print "%.2f & %.2f & %.2f" % (D, r2, q1)
 	# q3 = math.atan2(-math.sqrt(1-math.pow(D,2)), D)
 
@@ -44,8 +43,8 @@ def invkin(xyz):
 	
 	q4 = xyz[3]
 
-	print "q1:" + str(math.degrees(q1)) + ", q2: " + str(math.degrees(q2)) + ", q3: " + str(math.degrees(q3)) + ", q4: " + str(math.degrees(q4));
-	q2 = q2 - (math.pi/2);
+	print "q1:" + str(math.degrees(q1)) + ", q2: " + str(math.degrees(q2)) + ", q3: " + str(math.degrees(q3)) + ", q4: " + str(math.degrees(q4))
+	q2 = q2 - (math.pi/2)
 	return q1, q2, q3, q4
 
 class MoveRobot:
@@ -105,11 +104,11 @@ def pick_up(x_y_z_angle):
 	open_gripper()
 	print "Moving to brick location"
 	
-	arrList = [x_y_z_angle[0], x_y_z_angle[1]-5, 15, x_y_z_angle[3]];
+	arrList = [x_y_z_angle[0], x_y_z_angle[1]-5, 15, x_y_z_angle[3]]
 
 	move_arm(arrList)
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
-	node.send_command();
+	node.send_command()
 	time.sleep(2)
 	close_gripper()
 
@@ -117,10 +116,10 @@ def deliver(x_y_z_angle):
 	standard_position()
 	print "Moving to delivery location"
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
-	node.send_command();
+	node.send_command()
 	time.sleep(1)
 	open_gripper()
 
 def move_arm(x_y_z_angle):
 	node = MoveRobot("/arm_controller/follow_joint_trajectory", invkin(x_y_z_angle))
-	node.send_command();
+	node.send_command()

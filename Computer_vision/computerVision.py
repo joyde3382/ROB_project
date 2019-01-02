@@ -7,13 +7,9 @@ import math
 import cPickle
 import os
 import json
-# pipes 
-rfPath = "./p1"
 
-try:
-    os.mkfifo(rfPath)
-except OSError:
-    pass
+import rospy
+from std_msgs.msg import String
 
 class computerVision:
 
@@ -57,7 +53,7 @@ class computerVision:
             epsilon = 0.04*cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,epsilon,True) 
             
-            if len(approx) == 4:
+            if len(approx) >= 4:
                 rect = cv2.minAreaRect(approx)
                 area = cv2.contourArea(approx)
                 box = cv2.boxPoints(rect)
@@ -76,22 +72,23 @@ class computerVision:
                     brick.set_box(box)
 
                     bricks.append(brick)
-            elif len(approx) > 4:
-                (x,y),radius = cv2.minEnclosingCircle(cnt)
-                center = (int(x),int(y))
-                radius = int(radius)
-                area = radius*radius*math.pi
 
-                if area > 600 and area < 2000:
+            # elif len(approx) > 4:
+            #     (x,y),radius = cv2.minEnclosingCircle(cnt)
+            #     center = (int(x),int(y))
+            #     radius = int(radius)
+            #     area = radius*radius*math.pi
 
-                    brick = Brick()
-                    area = np.int0(area)
+            #     if area > 600 and area < 2000:
+
+            #         brick = Brick()
+            #         area = np.int0(area)
                 
-                    brick.set_area(area)
-                    brick.set_center(center)
-                    brick.set_radius(radius)
+            #         brick.set_area(area)
+            #         brick.set_center(center)
+            #         brick.set_radius(radius)
 
-                    bricks.append(brick)
+            #         bricks.append(brick)
 
         
                 
@@ -116,12 +113,12 @@ class computerVision:
         such that small holes are filled. Afterwards the 'blobs' are closed using a
         combination of dilate and erode
         """
-        ret,th1 = cv2.threshold(image,50,255,cv2.THRESH_BINARY)
-        if debug: cv2.imshow('th1',th1)
-        resdi = cv2.dilate(th1,np.ones((3,3),np.uint8))
-        if debug: cv2.imshow('dilated',resdi)
-        closing = cv2.morphologyEx(resdi, cv2.MORPH_CLOSE,np.ones((5,5),np.uint8))
-        if debug: cv2.imshow('closing',closing)
+        ret,th1 = cv2.threshold(image,150,255,cv2.THRESH_BINARY)
+        if debug: cv2.imwrite('debug_pics/threshold_binary.jpg',th1) #cv2.imshow('th1',th1)
+        resdi = cv2.dilate(th1,np.ones((7,7),np.uint8))
+        if debug: cv2.imwrite('debug_pics/dilated.jpg',resdi) #cv2.imshow('dilated',resdi)
+        closing = cv2.morphologyEx(resdi, cv2.MORPH_CLOSE,np.ones((7,7),np.uint8))
+        if debug: cv2.imwrite('debug_pics/closing.jpg',closing) # cv2.imshow('closing',closing)
 
         return closing
 
@@ -131,7 +128,7 @@ class computerVision:
         call findContours
         """
         imgray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-        if debug: cv2.imshow('gray_scale_contour',imgray)
+        if debug: cv2.imwrite('debug_pics/gray_scale_contour.jpg',imgray) # cv2.imshow('gray_scale_contour',imgray)
         im2, contours, hierarchy = cv2.findContours(imgray,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
         return contours,hierarchy
@@ -146,16 +143,18 @@ class computerVision:
         """
         single_color_img = self.extract_single_color_range(image,hsv,lower,upper)
         if debug:
-            cv2.imshow('single_color_img',single_color_img)
+            # cv2.imshow('single_color_img',single_color_img)
+            cv2.imwrite('debug_pics/single_color_img.jpg',single_color_img)
         single_channel = self.threshold_image(single_color_img,debug)
         if debug:
-            cv2.imshow('single_channel',single_channel)
+            # cv2.imshow('single_channel',single_channel)
+            cv2.imwrite('debug_pics/single_channel.jpg',single_channel)
         cont,hierarchy = self.contours(single_channel,debug)
 
         if debug:
             for i,cnt in enumerate(cont):
                 cv2.drawContours(single_channel,cont,i,(0,0,255),2)
-        if debug: cv2.imshow('contours',single_channel)
+        if debug: cv2.imwrite('debug_pics/contours.jpg',single_channel) #cv2.imshow('contours',single_channel)
 
         return self.get_bricks(cont)
 
@@ -241,18 +240,24 @@ hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 # this one works quite fine
 ###################
 
-lower_blue = np.array([110,80,80])
+lower_blue = np.array([110,125,125])
 upper_blue = np.array([190,255,255])
 
-lower_yellow = np.array([15,100,50])
+lower_yellow = np.array([15,155,125])
 upper_yellow = np.array([50,255,255])
+
+# lower_blue = np.array([110,80,80])
+# upper_blue = np.array([190,255,255])
+
+# lower_yellow = np.array([15,100,50])
+# upper_yellow = np.array([50,255,255])
 
 # lower_red = np.array([0,75,50])
 # upper_red = np.array([23,255,255])
 
 ####################
 
-blue_bricks = vision.do_full(image,hsv,upper_blue,lower_blue)
+blue_bricks = vision.do_full(image,hsv,upper_blue,lower_blue, True)
 yellow_bricks = vision.do_full(image,hsv,upper_yellow,lower_yellow)
 
 vision.show_bricks(image,blue_bricks,(255,0,0), 'Blue')
@@ -261,7 +266,6 @@ vision.show_bricks(image,yellow_bricks,(0,255,255), 'Yellow')
 bcenter = []
 bangle = []
 barea = []
-
 
 for b in blue_bricks:
 
@@ -290,13 +294,6 @@ for b in yellow_bricks:
 
     print 'Yellow object ' + ':' +  str(center) + ' //// angle: ' + str(angle) + ' //// area: ' + str(area) 
 
-#wfPath = "./p1"
-#wp = open(wfPath, 'w')
-#wp.write("")
-#wp.close()
-
-#wp = open(wfPath, 'w')
-
 x = {
 "Blue": {
   "center": bcenter,
@@ -310,22 +307,15 @@ x = {
   },
 }
 
+#http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28python%29 is used 
 
 y = json.dumps(x)
-
-
-#wp.write(y)
-#wp.close()
-
-   #http://wiki.ros.org/ROS/Tutorials/WritingPublisherSubscriber%28python%29 is used 
-import rospy
-from std_msgs.msg import String
 
 def talker():
     pub = rospy.Publisher('chatter', String, queue_size=10)
     rospy.init_node('talker', anonymous=True)
     rate = rospy.Rate(1) # 10hz
-    for x in range(3):
+    for x in range(10):
 		hello_str = y
 		rospy.loginfo(hello_str)
 		pub.publish(hello_str)
@@ -336,10 +326,6 @@ if __name__ == '__main__':
         talker()
     except rospy.ROSInterruptException:
         pass
-
-
-
-
 
 cv2.imshow('result',image)
 cv2.imwrite('result.jpg',image)
